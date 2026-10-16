@@ -17,6 +17,11 @@ set(LIBDEFLATE_BUILD_GZIP OFF CACHE BOOL "")
 
 set(UTF8PROC_INSTALL OFF CACHE BOOL "")
 
+# Optional targets (off by default): the CLI and benchmarks pull in extra
+# dependencies and are not needed when building the static library for Android.
+option(HOSHIDICTS_BUILD_CLI "Build the hoshidicts CLI" OFF)
+option(HOSHIDICTS_BUILD_BENCHMARKS "Build the hoshidicts benchmarks" OFF)
+
 add_subdirectory(external/glaze)
 add_subdirectory(external/zstd)
 add_subdirectory(external/unordered_dense)
@@ -50,26 +55,30 @@ target_link_libraries(hoshidicts PRIVATE
     utf8proc::utf8proc
 )
 
-add_executable(hoshidicts-cli
-    cli/main.cpp
-)
+if(HOSHIDICTS_BUILD_CLI)
+    add_executable(hoshidicts-cli
+        cli/main.cpp
+    )
 
-target_link_libraries(hoshidicts-cli PRIVATE
-    hoshidicts
-)
+    target_link_libraries(hoshidicts-cli PRIVATE
+        hoshidicts
+    )
+endif()
 
-add_executable(benchmark-import
-    benchmark/import.cpp
-)
+if(HOSHIDICTS_BUILD_BENCHMARKS)
+    add_executable(benchmark-import
+        benchmark/import.cpp
+    )
 
-target_link_libraries(benchmark-import PRIVATE
-    hoshidicts
-)
+    target_link_libraries(benchmark-import PRIVATE
+        hoshidicts
+    )
 
-add_executable(benchmark-lookup
-    benchmark/lookup.cpp
-)
+    add_executable(benchmark-lookup
+        benchmark/lookup.cpp
+    )
 
-target_link_libraries(benchmark-lookup PRIVATE
-    hoshidicts
-)
+    target_link_libraries(benchmark-lookup PRIVATE
+        hoshidicts
+    )
+endif()
